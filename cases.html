@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Camera Simulation</title>
+  <link rel="shortcut icon" href="./img/leaf.svg" />
+  <link
+rel="apple-touch-icon"
+sizes="180x180"
+href="./img/leaf.svg"
+/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      overflow: hidden;
+    }
+    #camera-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      pointer-events: none;
+    }
+    .grid div {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      transform: translate(-50%, -50%);
+      border: 2px solid yellow;
+      border-radius: 50%;
+    }
+    .controls {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 20px;
+    }
+    .modes {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .modes span {
+      margin: 0 10px;
+      opacity: 0.6;
+      font-size: 14px;
+      transition: opacity 0.3s;
+    }
+    .modes .active {
+      opacity: 1;
+      font-weight: bold;
+      color: yellow;
+    }
+
+
+
+  /* Исходное состояние кнопки */
+  .capture-button {
+    width: 70px;
+    height: 70px;
+    background-color: red;
+    border-radius: 50%;
+    border: 5px solid white;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Состояние кнопки во время записи */
+  .capture-button.recording {
+    background-color: white;
+    border-color: red;
+  }
+
+  .capture-button.recording::after {
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: red;
+    border-radius: 4px;
+  }
+
+  </style>
+</head>
+<body>
+    
+  <div id="camera-container">
+    <video id="video" autoplay></video>
+    <div class="grid">
+      <div></div><div></div><div></div>
+      <div></div><div></div><div></div>
+      <div></div><div></div><div></div>
+    </div>
+    <div class="center"></div>
+    <div class="controls">
+      <div class="modes">
+        <span>Киноэффект</span>
+        <span class="active">Видео</span>
+        <span>Фото</span>
+        <span>Портрет</span>
+      </div>
+      <div class="capture-button" id="capture-button"></div>
+    </div>
+  </div>
+  <script>
+    // Подключение к камере
+    const video = document.getElementById('video');
+
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch((error) => {
+        console.error('Ошибка доступа к камере:', error);
+      });
+
+    // Логика переключения режимов
+    const modes = document.querySelectorAll('.modes span');
+    modes.forEach((mode) => {
+      mode.addEventListener('click', () => {
+        modes.forEach((m) => m.classList.remove('active'));
+        mode.classList.add('active');
+      });
+    });
+    const captureButton = document.getElementById('capture-button');
+
+let isRecording = false;
+
+captureButton.addEventListener('click', () => {
+  isRecording = !isRecording; // Переключение состояния записи
+
+  if (isRecording) {
+    captureButton.classList.add('recording'); // Включить стиль "Запись"
+    console.log('Началась запись...');
+  } else {
+    captureButton.classList.remove('recording'); // Вернуть исходный стиль
+    console.log('Запись остановлена.');
+  }
+});
+  </script>
+</body>
+</html>
